@@ -34,7 +34,7 @@ traverse = map f
   where f (Loop var stmts) = Map [var] (traverse stmts)
         f (ArrAccess var vars) = Access var vars           -- Redundant, for now. Will expand.
 
--- Collapse chains of loops 
+-- Collapse chains of loops. This makes cases where loop interchange applies easier to identify.
 collapse :: AccessTree -> AccessTree
 collapse (Map [v] [t1]) = case (collapse t1) of
                             Map vs t2  -> Map (v:vs) t2
