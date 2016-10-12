@@ -1,6 +1,9 @@
 module PocParser
        (
          parseProg
+       , Program
+       , Stmt(..)
+       , LitVar
        )
 where
 
@@ -10,7 +13,7 @@ type Parser = Parsec String ()
 
 type Program = [Stmt]
 data Stmt = Loop LitVar [Stmt]
-          | Access LitVar [LitVar]
+          | ArrAccess LitVar [LitVar]
   deriving (Show)
 
 type LitVar = String
@@ -29,7 +32,7 @@ p_loop :: Parser Stmt
 p_loop = Loop <$> (str "loop" *> p_var) <*> ((chr '{' *> p_stmts) <* chr '}')
 
 p_access :: Parser Stmt 
-p_access = Access <$> (p_var <* chr '[' ) <*> (p_vars <* chr ']')
+p_access = ArrAccess <$> (p_var <* chr '[' ) <*> (p_vars <* chr ']')
 
 p_vars :: Parser [LitVar]
 p_vars = (:) <$> p_var <*>

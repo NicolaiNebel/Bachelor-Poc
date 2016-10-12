@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Poc
                      , PocParser
+                     , PocStrategy
   build-depends:       base >= 4.7 && < 5,
                        containers >= 0.5.7.1,
                        mtl >= 2.2.1,

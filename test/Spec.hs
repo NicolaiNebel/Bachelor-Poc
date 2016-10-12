@@ -1,15 +1,20 @@
 import System.Directory
 
 import PocParser
+import PocStrategy
 
 main :: IO ()
 main = do
   files <- getDirectoryContents "test/basic_programs"
-  mapM_ (parseTest "test/basic_programs/") files
+  mapM_ (progTest "test/basic_programs/") files
 
-parseTest :: FilePath -> FilePath -> IO ()
-parseTest _ "." = return ()
-parseTest _ ".." = return ()
-parseTest p f = do
+progTest :: FilePath -> FilePath -> IO ()
+progTest _ "." = return ()
+progTest _ ".." = return ()
+progTest p f = do
   program <- readFile (p++f)
-  print $ parseProg f program
+  let p = parseProg f program
+  print p
+  case p of
+    Right p -> print $ makeTree p
+    Left e -> return ()
