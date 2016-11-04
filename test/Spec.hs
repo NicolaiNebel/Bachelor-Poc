@@ -1,7 +1,6 @@
 import System.Directory
 
 import PocParser
-import PocStrategy
 
 main :: IO ()
 main = do
@@ -13,8 +12,6 @@ progTest _ "." = return ()
 progTest _ ".." = return ()
 progTest p f = do
   program <- readFile (p++f)
+  print ("Parsing " ++ (p++f))
   let p = parseProg f program
   print p
-  case p of
-    Right p -> print $ makeTree p
-    Left e -> return ()

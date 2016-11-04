@@ -1,43 +1,48 @@
-module PocStrategy
-  (
-    Strategy(..)
-  , Op(..)
-  , chooseStrategy
-  , makeTree
-  )
-where
+module PocStrategy where
 
-import Prelude hiding (traverse)
 import PocParser
 
-type Strategy = [Op]
+import Data.Monoid
+import qualified Data.Map.Lazy as Map
+import Data.List (nub, sort)
 
-data Op = Swap String String
-        | Transpose [String] [Integer]
-  deriving (Show, Eq)
+type Var = String
 
--- Currently we assume simple indices, which implies every individual index is invariant to
--- only one variable. This means we can represent an access pattern as just a list of strings.
-data AccessTree = Map [String] [AccessTree]
-                | Access String [String]
-  deriving (Show, Eq)
+type In a = Maybe (Maybe a)
+type Out a = [a]
+type Tr = (In Int, Out Int)
+type ArrMap = Map.Map Var Tr
+
+data Access = Access { interIn :: In Var
+                     , interOut :: Out Var
+                     , transposes :: ArrMap
+                     }
+
+instance Monoid Access where
+  mempty = Access (Just Nothing) [] Map.empty
+  p1 `mappend` p2 = Access in' out' tr'
+    where in' = case (interIn p1, interIn p2) of
+                  (Just i1, Just i2) -> Just $ join i1 i2
+                  _                  -> Nothing
+          out' = sort $ nub (interOut p1 ++ interOut p2)
+          tr' = Map.unionWith joinTransposes (transposes p1) (transposes p2)
 
 
-chooseStrategy :: Program -> Strategy
-chooseStrategy = undefined
+join :: (Eq a) => Maybe a -> Maybe a -> Maybe a
+join x Nothing = x
+join Nothing y = y
+join (Just a) (Just b) = if a == b then Just a else Nothing
 
-makeTree :: Program -> [AccessTree]
-makeTree = map collapse . traverse
+joinTransposes :: Tr -> Tr -> Tr
+joinTransposes (i1, o1) (i2, o2) = (i3, o3)
+  where i3 = case (i1, i2) of
+              (Just x, Just y) -> if x == y then Just x else Nothing
+              (Nothing, y) -> y
+              (x, Nothing) -> x
+        o3 = sort $ nub (o1 ++ o2)
 
-traverse :: Program -> [AccessTree]
-traverse = map f
-  where f (Loop var stmts) = Map [var] (traverse stmts)
-        f (ArrAccess var vars) = Access var vars           -- Redundant, for now. Will expand.
+chooseStrategy :: Program -> [Access]
+chooseStrategy = undefined 
 
--- Collapse chains of loops. This makes cases where loop interchange applies easier to identify.
-collapse :: AccessTree -> AccessTree
-collapse (Map [v] [t1]) = case (collapse t1) of
-                            Map vs t2  -> Map (v:vs) t2
-                            t          -> Map [v] [t]
-collapse (Map vs ts)  = Map vs (map collapse ts)
-collapse t            = t
+generate :: [Var] -> Stmt -> [Access]
+generate = undefined

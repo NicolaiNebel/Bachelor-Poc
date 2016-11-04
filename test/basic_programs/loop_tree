@@ -1,13 +1,5 @@
-loop p1 {
-  loop p2 {
-    loop p3 {
-      A[p1,p2,p3];
-      B[p3];
-    }
-    loop p4 {
-      loop p5 {
-        A[p1,p4,p5];
-      }
-    }
-  }
+Kernel (p1,p,p3,p4,p5) {
+  A[p1,p2,p3];
+  B[p3];
+  A[p1,p4,p5];
 }
