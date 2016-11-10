@@ -3,7 +3,7 @@ module PocParser
          parseProg
        , Program
        , Stmt(..)
-       , LitVar
+       , Index(..)
        )
 where
 
@@ -12,12 +12,14 @@ import Text.Parsec hiding (token)
 type Parser = Parsec String ()
 
 type Program = Kernel
-data Kernel = Kernel [LitVar] [Stmt]
+data Kernel = Kernel [String] [Stmt]
   deriving (Show)
-data Stmt = ArrAccess LitVar [LitVar]
+data Stmt = ArrAccess String [Index]
   deriving (Show)
 
-type LitVar = String
+-- This name needs to go. And fast.
+data Index = Var String | Inv
+  deriving (Show, Eq)
 
 
 parseProg :: SourceName -> String -> Either ParseError Program
@@ -34,15 +36,18 @@ p_stmt :: Parser Stmt
 p_stmt = (p_access <* chr ';')
 
 p_access :: Parser Stmt 
-p_access = ArrAccess <$> (p_var <* chr '[' ) <*> (p_vars <* chr ']')
+p_access = ArrAccess <$> (p_var <* chr '[' ) <*> (p_indexes <* chr ']')
 
-p_vars :: Parser [LitVar]
+p_indexes :: Parser [Index]
+p_indexes = fmap (map Var) p_vars
+
+p_vars :: Parser [String]
 p_vars = (:) <$> p_var <*>
   (   chr ',' *> p_vars       -- Extra vars
   <|> return []               -- Last var
   )
 
-p_var :: Parser LitVar
+p_var :: Parser String
 p_var = token $ (:) <$> letter <*> many alphaNum
 
 chr :: Char -> Parser Char
