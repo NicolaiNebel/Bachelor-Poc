@@ -48,14 +48,14 @@ plusTestData = [ ( Access (Just "p1") [] empty
                , ( Access Nothing ["p1"] empty
                  , Access Nothing ["p1"] empty -- outerIn
                  )
-               , ( Access Nothing [] ( fromList [("A",(Just 2,[]))] )
-                 , Access Nothing [] ( fromList [("B",(Just 2,[]))] ) -- Combine two diff arrays
+               , ( Access Nothing [] ( fromList [("A",(Just 2))] )
+                 , Access Nothing [] ( fromList [("B",(Just 2))] ) -- Combine two diff arrays
                  )
-               , ( Access Nothing [] ( fromList [("A",(Just 2,[]))] )
-                 , Access Nothing [] ( fromList [("A",(Just 2,[]))] ) -- Combine two eq arrays
+               , ( Access Nothing [] ( fromList [("A",(Just 2))] )
+                 , Access Nothing [] ( fromList [("A",(Just 2))] ) -- Combine two eq arrays
                  )
-               , ( Access Nothing [] ( fromList [("A",(Just 2,[]))] )
-                 , Access Nothing [] ( fromList [("A",(Just 0,[]))] ) -- Fail on combining
+               , ( Access Nothing [] ( fromList [("A",(Just 2))] )
+                 , Access Nothing [] ( fromList [("A",(Just 0))] ) -- Fail on combining
                  )
                 ]
 
@@ -67,10 +67,10 @@ plusTestExpect = [ Just $ Access (Just "p1") [] empty -- interIn agree
                  , Just $ Access Nothing ["p1","p2"] empty -- outerIn
                  , Just $ Access Nothing ["p1","p2"] empty
                  , Just $ Access Nothing ["p1"] empty
-                 , Just $ Access Nothing [] ( fromList [("A",(Just 2,[])) -- transposes
-                                                       ,("B",(Just 2,[]))
+                 , Just $ Access Nothing [] ( fromList [("A",(Just 2)) -- transposes
+                                                       ,("B",(Just 2))
                                                        ] ) -- Combine two diff arrays
-                 , Just $ Access Nothing [] ( fromList [("A",(Just 2,[]))] )
+                 , Just $ Access Nothing [] ( fromList [("A",(Just 2))] )
                  , Nothing
                  ]
 
@@ -87,12 +87,12 @@ plusTestMsg = [ "interIn: Same Just"
               , "transposes: Fail on combining"
               ]
 
-generateAllTest :: IO ()
-generateAllTest = do
-  putStrLn "Generate all"
-  files <- getDirectoryContents "test/basic_programs"
-  progs <- allPrograms
-  mapM_ pGenerate progs
+--generateAllTest :: IO ()
+--generateAllTest = do
+--  putStrLn "Generate all"
+--  files <- getDirectoryContents "test/basic_programs"
+--  progs <- allPrograms
+--  mapM_ pGenerate progs
 
 chooseStrategyTest :: IO ()
 chooseStrategyTest = do
@@ -107,11 +107,11 @@ pChoose program = do
   prettyAccesses strat
   putStrLn ""
 
-pGenerate :: Kernel -> IO ()
-pGenerate program = do
-  let as = makeAccesses program
-  prettyGenerate as
-  putStrLn ""
+--pGenerate :: Kernel -> IO ()
+--pGenerate program = do
+--  let as = makeAccesses program
+--  prettyGenerate as
+--  putStrLn ""
 
 prettyAccesses :: [Access] -> IO ()
 prettyAccesses as = do 
@@ -121,10 +121,10 @@ prettyAccesses as = do
   where
     p a = putStrLn (show a)
 
-prettyGenerate :: [[Access]] -> IO ()
-prettyGenerate as = do putStrLn "["
-                       mapM_ prettyAccesses as
-                       putStrLn "]"
+--prettyGenerate :: [[Access]] -> IO ()
+--prettyGenerate as = do putStrLn "["
+--                       mapM_ prettyAccesses as
+--                       putStrLn "]"
 
 allPrograms :: IO [Kernel]
 allPrograms = do
