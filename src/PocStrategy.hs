@@ -5,7 +5,7 @@ import PocParser
 import Control.Monad
 import Data.Monoid
 import qualified Data.Map.Lazy as Map
-import Data.List (nub, sort)
+import Data.List (nub, sort, minimumBy)
 import Data.Maybe
 
 type Var = String
@@ -36,7 +36,7 @@ a1 `plus` a2 = do
   tr <- joinTr (transposes a1) (transposes a2)
   Just $ Access interIn interOut tr
 
--- Helper functions for plus
+-- Helper functions for plus --
 joinIn :: (Eq a) => In a -> In a -> Maybe (In a)
 joinIn x Nothing = return x
 joinIn Nothing y = return y
@@ -59,18 +59,26 @@ joinTransposes i1 i2 = do i1' <- i1
                           i2' <- i2
                           if i1 == i2 then Just i1 else Nothing
 
--- The real meat. 
-chooseStrategy :: Kernel -> [Access]
-chooseStrategy (Kernel lvs stmts) = makeStrategy as
-  where as = map (generate lvs) stmts
+----
 
---Temp tester function
---makeAccesses :: Kernel -> [[Access]]
---makeAccesses (Kernel lvs stmts) = map (generate lvs) stmts
+-- The real meat. 
+chooseStrategy :: Kernel -> Maybe Access
+chooseStrategy (Kernel lvs stmts) = case ss of
+                                     [] -> Nothing
+                                     ss -> Just $ minimumBy accessCmp ss
+  where ss = (filter notAllOut) . makeStrategy $ map (generate lvs) stmts
+        notAllOut a = length (interOut a) < length lvs
+
+-- Order strategies on the number of transpositions made
+accessCmp :: Access -> Access -> Ordering
+accessCmp a b = a' `compare` b'
+  where nonemptyTr Nothing = False
+        nonemptyTr (Just a) = a > 0
+        [a',b'] = map (Map.size . Map.filter nonemptyTr . transposes) [a,b]
 
 -- Fold over all array accesses generated
 makeStrategy :: [[Access]] -> [Access]
-makeStrategy = foldr combine [ unit ]
+makeStrategy = foldr combine [unit]
   where combine xs ys = catMaybes [ plus x y | x <- xs, y <- ys ]
 
 -- Generate all the possible startegy choices for a single array lookup
@@ -93,6 +101,7 @@ generate lvs (ArrAccess arr is) = catMaybes (out : ins)
         pushOut :: [Index] -> [String] -> Maybe Access
         pushOut is lvs = Just $ Access Nothing (sort . filter (isVariantTo is) $ lvs) Map.empty
 
+
 isVariantTo :: [Index] -> String -> Bool
 isVariantTo is var = variantIndices is var /= []
 
@@ -100,3 +109,8 @@ isVariantTo is var = variantIndices is var /= []
 -- From innermost to outermost! That is, i is the position of the relevant access.
 variantIndices :: [Index] -> String -> [Int]
 variantIndices is var = filter (\x -> (is !! x) == Var var) [0..length is-1]
+
+
+--Temp tester function
+--makeAccesses :: Kernel -> [[Access]]
+--makeAccesses (Kernel lvs stmts) = map (generate lvs) stmts
