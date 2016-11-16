@@ -1,7 +1,7 @@
 module PocParser
        (
          parseProg
-       , Program
+       , Kernel (..)
        , Stmt(..)
        , Index(..)
        )
@@ -11,7 +11,6 @@ import Text.Parsec hiding (token)
 
 type Parser = Parsec String ()
 
-type Program = Kernel
 data Kernel = Kernel [String] [Stmt]
   deriving (Show)
 data Stmt = ArrAccess String [Index]
@@ -22,7 +21,7 @@ data Index = Var String | Inv
   deriving (Show, Eq)
 
 
-parseProg :: SourceName -> String -> Either ParseError Program
+parseProg :: SourceName -> String -> Either ParseError Kernel
 parseProg = parse (p_kernel <* eof)
 
 p_kernel :: Parser Kernel

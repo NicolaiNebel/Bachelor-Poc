@@ -1,5 +1,4 @@
 Kernel (p1,p,p3,p4,p5) {
   A[p1,p2,p3];
   B[p3];
-  A[p1,p4,p5];
 }

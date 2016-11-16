@@ -1,5 +1,7 @@
 module StrategyTest where
 
+import System.Directory
+
 import PocParser
 import PocStrategy
 
@@ -85,4 +87,52 @@ plusTestMsg = [ "interIn: Same Just"
               , "transposes: Fail on combining"
               ]
 
+generateAllTest :: IO ()
+generateAllTest = do
+  putStrLn "Generate all"
+  files <- getDirectoryContents "test/basic_programs"
+  progs <- allPrograms
+  mapM_ pGenerate progs
 
+chooseStrategyTest :: IO ()
+chooseStrategyTest = do
+  putStrLn "Choose Strategy"
+  files <- getDirectoryContents "test/basic_programs"
+  progs <- allPrograms
+  mapM_ pChoose progs
+
+pChoose :: Kernel -> IO ()
+pChoose program = do
+  let strat = chooseStrategy program
+  prettyAccesses strat
+  putStrLn ""
+
+pGenerate :: Kernel -> IO ()
+pGenerate program = do
+  let as = makeAccesses program
+  prettyGenerate as
+  putStrLn ""
+
+prettyAccesses :: [Access] -> IO ()
+prettyAccesses as = do 
+  putStrLn "\t["
+  mapM_ (\a -> putStr "\t" >> p a) as
+  putStrLn "\t]"
+  where
+    p a = putStrLn (show a)
+
+prettyGenerate :: [[Access]] -> IO ()
+prettyGenerate as = do putStrLn "["
+                       mapM_ prettyAccesses as
+                       putStrLn "]"
+
+allPrograms :: IO [Kernel]
+allPrograms = do
+  files <- getDirectoryContents ("test/basic_programs")
+  mapM parseFile (filter (\f -> f /= "." && f /= "..") files)
+  where
+    parseFile f = do
+      program <- readFile ("test/basic_programs/" ++ f)
+      case parseProg f program of
+        Left e  -> undefined
+        Right p -> return p

@@ -64,8 +64,18 @@ joinTransposes (i1, o1) (i2, o2) = do
       let o3 = sort . nub $ o1 ++ o2
       return (i1, o3)
 
-chooseStrategy :: Program -> [Access]
-chooseStrategy = undefined 
+chooseStrategy :: Kernel -> [Access]
+chooseStrategy (Kernel lvs stmts) = makeStrategy as
+  where as = map (generate lvs) stmts
+
+--Temp tester function
+makeAccesses :: Kernel -> [[Access]]
+makeAccesses (Kernel lvs stmts) = map (generate lvs) stmts
+
+makeStrategy :: [[Access]] -> [Access]
+makeStrategy = foldr combine [ accessId ]
+  where combine xs ys = catMaybes [ plus x y | x <- xs, y <- ys ]
+        accessId = Access Nothing [] Map.empty
 
 -- [LoopVars] ArrAccess -> [Initial As]
 generate :: [Var] -> Stmt -> [Access]

@@ -10,6 +10,8 @@ main :: IO ()
 main = do
   mapM_ (uncurry generateTest) genTests
   plusTest
+  generateAllTest
+  chooseStrategyTest
 
 -- PARSER AND PROGRAMS STUFF --
 --main :: IO ()
