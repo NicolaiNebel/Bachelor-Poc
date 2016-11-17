@@ -8,8 +8,8 @@ import StrategyTest
 -- Test GENERATE --
 main :: IO ()
 main = do
-  mapM_ (uncurry generateTest) genTests
-  plusTest
+  --mapM_ (uncurry generateTest) genTests
+  --plusTest
   --generateAllTest
   chooseStrategyTest
 

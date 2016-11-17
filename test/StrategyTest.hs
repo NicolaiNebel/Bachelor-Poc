@@ -97,13 +97,13 @@ plusTestMsg = [ "interIn: Same Just"
 chooseStrategyTest :: IO ()
 chooseStrategyTest = do
   putStrLn "Choose Strategy"
-  files <- getDirectoryContents "test/basic_programs"
   progs <- allPrograms
   mapM_ pChoose progs
 
-pChoose :: Kernel -> IO ()
-pChoose program = do
+pChoose :: (String,Kernel) -> IO ()
+pChoose (s, program) = do
   let strat = chooseStrategy program
+  putStrLn s
   putStrLn (show strat)
   putStrLn ""
 
@@ -126,7 +126,7 @@ prettyAccesses as = do
 --                       mapM_ prettyAccesses as
 --                       putStrLn "]"
 
-allPrograms :: IO [Kernel]
+allPrograms :: IO [(String,Kernel)]
 allPrograms = do
   files <- getDirectoryContents ("test/basic_programs")
   mapM parseFile (filter (\f -> f /= "." && f /= "..") files)
@@ -135,4 +135,4 @@ allPrograms = do
       program <- readFile ("test/basic_programs/" ++ f)
       case parseProg f program of
         Left e  -> undefined
-        Right p -> return p
+        Right p -> return (f,p)
