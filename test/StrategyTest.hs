@@ -102,9 +102,11 @@ chooseStrategyTest = do
 
 pChoose :: (String,Kernel) -> IO ()
 pChoose (s, program) = do
-  let strat = chooseStrategy program
   putStrLn s
+  let strat = chooseStrategy program
+  let strats = makeStrategy (makeAccesses program)
   putStrLn (show strat)
+  prettyAccesses strats
   putStrLn ""
 
 --pGenerate :: Kernel -> IO ()
@@ -120,11 +122,6 @@ prettyAccesses as = do
   putStrLn "\t]"
   where
     p a = putStrLn (show a)
-
---prettyGenerate :: [[Access]] -> IO ()
---prettyGenerate as = do putStrLn "["
---                       mapM_ prettyAccesses as
---                       putStrLn "]"
 
 allPrograms :: IO [(String,Kernel)]
 allPrograms = do

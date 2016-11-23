@@ -112,5 +112,5 @@ variantIndices is var = filter (\x -> (is !! x) == Var var) [0..length is-1]
 
 
 --Temp tester function
---makeAccesses :: Kernel -> [[Access]]
---makeAccesses (Kernel lvs stmts) = map (generate lvs) stmts
+makeAccesses :: Kernel -> [[Access]]
+makeAccesses (Kernel lvs stmts) = map (generate lvs) stmts
