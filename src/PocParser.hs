@@ -38,7 +38,7 @@ p_access :: Parser Stmt
 p_access = ArrAccess <$> (p_var <* chr '[' ) <*> (p_indexes <* chr ']')
 
 p_indexes :: Parser [Index]
-p_indexes = fmap (map Var) p_vars
+p_indexes = fmap (reverse . map Var) p_vars
 
 p_vars :: Parser [String]
 p_vars = (:) <$> p_var <*>

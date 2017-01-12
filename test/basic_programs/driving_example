@@ -1,0 +1,5 @@
+Kernel (i,j,k) {
+  muls[i];
+  bias[k,i,j];
+  arr[j,i];
+}
